@@ -1,6 +1,8 @@
 # stickystuff
 
-An app made with flutter to add Telegram sticker packs to Whatsapp.
+An app to add Telegram sticker packs to Whatsapp.
+
+made with ❤️ using flutter
 
 ## Disclaimer
 
