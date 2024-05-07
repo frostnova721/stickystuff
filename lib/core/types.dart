@@ -5,3 +5,5 @@ class StickerSearchModal {
 
   StickerSearchModal({required this.author, required this.name, required this.stickers});
 }
+
+typedef DownloadProgressCallback = void Function(int completedDownloads, int totalItems);

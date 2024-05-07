@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:stickystuff/core/stickers.dart';
 import 'package:stickystuff/core/types.dart';
 import 'package:stickystuff/modals/snackbar.dart';
@@ -17,6 +18,18 @@ class _FinalPageState extends State<FinalPage> {
   TextEditingController packNameController = TextEditingController();
 
   TextEditingController authorNameController = TextEditingController();
+
+  bool addOnProgress = false;
+
+  int downloadedStickers = 0;
+  int totalStickers = 0;
+
+  void updateDownloadProgress(int downloadedItems, int totalItems) {
+    setState(() {
+      downloadedStickers = downloadedItems;
+      totalStickers = totalItems;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -202,15 +215,65 @@ class _FinalPageState extends State<FinalPage> {
                         enabledBorder: UnderlineInputBorder(borderSide: BorderSide())),
                   ),
                 ),
-                if(widget.stickerPack.stickers.length > 30)
-                Container(
-                  padding: EdgeInsets.fromLTRB(15, 15, 15, 0),
-                  child: Text("*This pack contains morethan 30 stickers. Only the first 30 will be selected for the pack", style: TextStyle(color: Colors.red[400]),),
-                )
+                if (widget.stickerPack.stickers.length > 30)
+                  Container(
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 0),
+                    child: Text(
+                      "*This pack contains morethan 30 stickers. Only the first 30 will be selected for the pack",
+                      style: TextStyle(color: Colors.red[400]),
+                    ),
+                  ),
+                if (totalStickers != 0 && totalStickers != downloadedStickers)
+                  Container(
+                    margin: EdgeInsets.only(top: 35, left: 25, right: 25),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            LoadingAnimationWidget.halfTriangleDot(color: Colors.deepPurple[500]!, size: 30),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: Text(
+                                "Downloading Stickers...",
+                                style: TextStyle(fontFamily: "PTSans", fontSize: 18),
+                              ),
+                            )
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 15),
+                          child: TweenAnimationBuilder<double>(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut,
+                            tween: Tween<double>(
+                              begin: 0,
+                              end: (downloadedStickers / totalStickers).clamp(0, 1),
+                            ),
+                            builder: (context, value, _) => LinearProgressIndicator(
+                              value: value,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: Text(
+                              "($downloadedStickers / $totalStickers)",
+                              style:
+                                  TextStyle(fontFamily: "Ubuntu", color: Colors.grey[600], fontWeight: FontWeight.bold),
+                            ))
+                      ],
+                    ),
+                  ),
               ],
             ),
             ElevatedButton(
               onPressed: () async {
+                if (addOnProgress) {
+                  showSnackBar(context, "This pack is already being added!");
+                  return;
+                }
+                addOnProgress = true;
                 showSnackBar(context, "processing...");
                 try {
                   await Stickers().addPackToWhatsApp(
@@ -218,12 +281,18 @@ class _FinalPageState extends State<FinalPage> {
                       packNameController.value.text.isNotEmpty
                           ? packNameController.value.text
                           : widget.stickerPack.name.toLowerCase(),
-                      author:
-                          authorNameController.value.text.isNotEmpty ? authorNameController.value.text : "stickystuff",
+                      (completedDownloads, totalItems) => updateDownloadProgress(completedDownloads, totalItems),
+                      author: authorNameController.value.text.isNotEmpty
+                          ? authorNameController.value.text
+                          : widget.stickerPack.author,
                       trayIconIndex: selectedIconIndex);
+                  setState(() {
+                    addOnProgress = false;
+                  });
                 } catch (err) {
                   print(err);
-                  showSnackBar(context, "$err");
+                  showSnackBar(context, err.toString());
+                  addOnProgress = false;
                 }
               },
               style: ElevatedButton.styleFrom(

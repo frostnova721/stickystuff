@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
           _searching = false;
           _searchError = true;
         });
-        showSnackBar(context, "Couldnt fetch the sticker pack!");
+        showSnackBar(context, "Couldnt fetch the sticker pack! ${err.toString()}");
       }
     }
   }

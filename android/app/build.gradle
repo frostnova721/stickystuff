@@ -72,7 +72,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfigs.debug
+            signingConfigs.release
         }
         release {
             // TODO: Add your own signing config for the release build.

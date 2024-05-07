@@ -13,7 +13,6 @@ import 'package:stickystuff/core/types.dart';
 import 'package:flutter_whatsapp_stickers/flutter_whatsapp_stickers.dart';
 
 class Stickers {
-  
   Future<StickerSearchModal?> fetchStickers(String packLink) async {
     final dio = Dio();
     final res = await dio.get("https://weeb-api.vercel.app/telesticker?url=$packLink");
@@ -25,30 +24,35 @@ class Stickers {
         author: result['title'], name: result['name'], stickers: List<String>.from(result['stickers']));
   }
 
-  Future addPackToWhatsApp(List<String> urls, String packName,
+  Future addPackToWhatsApp(List<String> urls, String packName, DownloadProgressCallback callback,
       {int trayIconIndex = 0, String author = "stickystuff"}) async {
     //no whatsapp checks since it always returns false!
 
-    final packDir = (await getApplicationDocumentsDirectory()).path;
-    final stickersDir = Directory(packDir);
-    if (!(await stickersDir.exists())) {
-      await stickersDir.create(recursive: true);
-    }
-    await _downloadStickers(urls, packName, author, packDir, trayIconIndex);
+    try {
+      final packDir = (await getApplicationDocumentsDirectory()).path;
+      final stickersDir = Directory(packDir);
+      if (!(await stickersDir.exists())) {
+        await stickersDir.create(recursive: true);
+      }
+      await _downloadStickers(urls, packName, author, packDir, trayIconIndex, callback);
 
-    WhatsAppStickers().addStickerPack(
-      packageName: WhatsAppPackage.Consumer,
-      stickerPackIdentifier: packName,
-      stickerPackName: packName,
-      listener: (action, status, {error = ''}) async {
-        print(action.name);
-        print("status: $status");
-        if (error.isNotEmpty) {
-          print("ERROR: $error");
-          // throw Exception(error);
-        }
-      },
-    );
+      WhatsAppStickers().addStickerPack(
+        packageName: WhatsAppPackage.Consumer,
+        stickerPackIdentifier: packName,
+        stickerPackName: packName,
+        listener: (action, status, {error = ''}) async {
+          print(action.name);
+          print("status: $status");
+          if (error.isNotEmpty) {
+            print("ERROR: $error");
+            throw Exception(error);
+          }
+        },
+      );
+    } on Exception catch (e) {
+      print(e.toString());
+      rethrow;
+    }
   }
 
   //creates the tray icon by resizing the selected icon
@@ -81,8 +85,8 @@ class Stickers {
   }
 
   /// Downloads the stickers, makes and saves the tray icon and json file
-  Future<void> _downloadStickers(
-      List<String> urls, String packName, String author, String docsDir, int trayIconIndex) async {
+  Future<void> _downloadStickers(List<String> urls, String packName, String author, String docsDir, int trayIconIndex,
+      DownloadProgressCallback callback) async {
     final dio = Dio();
 
     await _createTrayIcon(urls[trayIconIndex], packName, dio, docsDir);
@@ -90,7 +94,7 @@ class Stickers {
     Map<String, dynamic> jsonContent = {};
     if (urls.length > 30) urls = urls.sublist(0, 30);
     List<Map<String, dynamic>> stickerDataArray = [];
-    List<double> sizeArray = [];
+    // List<double> sizeArray = [];
 
     for (int count = 0; count < urls.length; count++) {
       final itemName = "${packName}_$count";
@@ -103,14 +107,15 @@ class Stickers {
           await _validateAndSaveSticker("$docsDir/sticker_packs/$packName/$itemName.webp", download.data);
       print(validation);
       print("downloaded $itemName.webp");
-      sizeArray.add(int.parse(download.headers.map['content-length']![0]) / 1024);
+      callback.call(count + 1, urls.length);
+      // sizeArray.add(int.parse(download.headers.map['content-length']![0]) / 1024);
     }
 
-    for (final size in sizeArray) {
-      if (size > 100) {
-        print("found an item over 100kb");
-      }
-    }
+    // for (final size in sizeArray) {
+    //   if (size > 100) {
+    //     print("found an item over 100kb");
+    //   }
+    // }
 
     jsonContent = {
       "identifier": packName,
