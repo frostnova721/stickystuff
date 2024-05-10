@@ -27,9 +27,8 @@ class Stickers {
   Future addPackToWhatsApp(List<String> urls, String packName, DownloadProgressCallback callback,
       {int trayIconIndex = 0, String author = "stickystuff"}) async {
     //no whatsapp checks since it always returns false!
-
+    final packDir = (await getApplicationDocumentsDirectory()).path;
     try {
-      final packDir = (await getApplicationDocumentsDirectory()).path;
       final stickersDir = Directory(packDir);
       if (!(await stickersDir.exists())) {
         await stickersDir.create(recursive: true);
@@ -47,11 +46,13 @@ class Stickers {
             print("ERROR: $error");
             throw Exception(error);
           }
+          // await _deleteStickers("$packDir/sticker_packs/$packName");
         },
       );
     } on Exception catch (e) {
-      print(e.toString());
-      rethrow;
+      // print(e.toString());
+      await _deleteStickers("$packDir/sticker_packs/$packName");
+      throw Exception(e.toString());
     }
   }
 
@@ -105,7 +106,7 @@ class Stickers {
       final download = await dio.get(urls[count], options: Options(responseType: ResponseType.bytes));
       final validation =
           await _validateAndSaveSticker("$docsDir/sticker_packs/$packName/$itemName.webp", download.data);
-      print(validation);
+      print("passes requirements: $validation");
       print("downloaded $itemName.webp");
       callback.call(count + 1, urls.length);
       // sizeArray.add(int.parse(download.headers.map['content-length']![0]) / 1024);
@@ -137,7 +138,7 @@ class Stickers {
   Future<bool> _validateAndSaveSticker(String path, Uint8List stickerBuffer) async {
     final webp = decodeWebP(stickerBuffer);
     if (webp == null) throw Exception("ERR_WITH_WEBP");
-    print("${webp.width} ${webp.height}");
+    print("dimensions: ${webp.width}x${webp.height}");
     if (webp.width != 512 || webp.height != 512) {
       final resized = await Resizer().resizeWebp(stickerBuffer, path);
       if (!resized) throw Exception("Error Resizing Webp File");
@@ -166,5 +167,13 @@ class Stickers {
     mapped['sticker_packs'] = [jsonContent];
 
     await json.writeAsString(jsonEncode(mapped));
+  }
+
+  Future<void> _deleteStickers(String packDir) async {
+    final dir = Directory(packDir);
+    if (!(await dir.exists())) {
+      return;
+    }
+    await dir.delete(recursive: true);
   }
 }

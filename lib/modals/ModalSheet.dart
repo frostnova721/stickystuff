@@ -49,7 +49,8 @@ class _ModalSheetState extends State<ModalSheet> {
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,6 +89,7 @@ class _ModalSheetState extends State<ModalSheet> {
                                     width: 50,
                                     height: 50,
                                     fit: BoxFit.fill,
+                                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[50] , child: Center(child: Text("Couldn't load image!"))),
                                     frameBuilder: (context, child, frame,
                                         wasSynchronouslyLoaded) {
                                       if (wasSynchronouslyLoaded) return child;

@@ -31,10 +31,10 @@ class _StickyStuffState extends State<StickyStuff> {
   void checkAndRequestPermission() async {
     final info = await DeviceInfoPlugin();
     final sdkVersion = (await info.androidInfo).version.sdkInt;
-    // const manageStorage = Permission.manageExternalStorage;
-    // if (!(await manageStorage.isPermanentlyDenied) && await manageStorage.isDenied) {
-    //   await manageStorage.request();
-    // }
+    const manageStorage = Permission.manageExternalStorage;
+    if (!(await manageStorage.isPermanentlyDenied) && await manageStorage.isDenied) {
+      await manageStorage.request();
+    }
     if (sdkVersion > 32) {
       const photos = Permission.photos;
       if (!(await photos.isPermanentlyDenied) && await photos.isDenied) {
