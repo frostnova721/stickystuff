@@ -47,6 +47,7 @@ class _FinalPageState extends State<FinalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.deepPurple[100],
       body: Container(
         padding:
