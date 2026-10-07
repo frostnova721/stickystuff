@@ -152,7 +152,7 @@ class _HomeState extends State<Home> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
-                      child: Text("PS: dont use animated stickers. it sucks"),
+                      child: Text("Animated WebP supported. TGS/WebM need conversion."),
                     ),
                   ],
                 )),

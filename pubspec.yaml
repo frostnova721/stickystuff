@@ -30,24 +30,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  path_provider: ^2.1.2
-  dio: ^5.4.3+1
-  flutter_whatsapp_stickers: ^1.0.1+5
-  flutter_image_converter: ^0.3.2
-  image: ^4.1.7
-  flutter_image_compress: ^2.2.0
-  permission_handler: ^11.3.1
-  device_info_plus: ^10.1.0
-  loading_animation_widget: ^1.2.1
+  path_provider: ^2.1.6
+  dio: ^5.11.1
+  flutter_image_converter: ^0.4.1
+  image: ^4.10.1
+  flutter_image_compress: ^2.5.1
+  permission_handler: ^13.0.2
+  device_info_plus: ^13.3.0
+  loading_animation_widget: ^1.3.0
+  flutter_whatsapp_stickers: 
+    path: "../flutter_whatsapp_stickers"
 
-  # The following adds the Cupertino Icons font to your application.
+  # The following adds the Cupertino Icons font sto your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.3
   change_app_package_name: ^1.1.0
 
 # For information on the generic Dart part of this file, see the

@@ -12,6 +12,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true"
+        android:exported="true"
         tools:replace="android:name">
         <meta-data android:name="NonAssetContentProvider" android:value="true" />
         <activity

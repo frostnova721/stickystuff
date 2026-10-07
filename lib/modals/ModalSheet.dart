@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stickystuff/core/sticker_image.dart';
 import 'package:stickystuff/core/types.dart';
 import 'package:stickystuff/modals/snackbar.dart';
 import 'package:stickystuff/pages/finalPage.dart';
@@ -24,12 +25,13 @@ class _ModalSheetState extends State<ModalSheet> {
   }
 
   void isVideoPresent() {
-    for(final item in stickerPack.stickers) {
-      if(item.endsWith("webm")) {
+    for (final item in stickerPack.stickers) {
+      if ([".webm", ".tgs", ".gif"].any((extension) =>
+          Uri.parse(item).path.toLowerCase().endsWith(extension))) {
         setState(() {
           hasVideo = true;
         });
-        
+
         break;
       }
     }
@@ -84,12 +86,19 @@ class _ModalSheetState extends State<ModalSheet> {
                                   margin: EdgeInsets.all(5),
                                   height: itemWidth,
                                   width: itemWidth,
-                                  child: Image.network(
-                                    stickerPack.stickers[(i * 4 + j)],
+                                  child: Image(
+                                    image: StickerImage(
+                                        stickerPack.stickers[(i * 4 + j)]),
                                     width: 50,
                                     height: 50,
                                     fit: BoxFit.fill,
-                                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey[50] , child: Center(child: Text("Couldn't load image!"))),
+                                    errorBuilder: (context, error,
+                                            stackTrace) =>
+                                        Container(
+                                            color: Colors.grey[50],
+                                            child: Center(
+                                                child: Text(
+                                                    "Couldn't load image!"))),
                                     frameBuilder: (context, child, frame,
                                         wasSynchronouslyLoaded) {
                                       if (wasSynchronouslyLoaded) return child;
@@ -114,9 +123,11 @@ class _ModalSheetState extends State<ModalSheet> {
             alignment: Alignment.center,
             child: ElevatedButton(
               onPressed: () {
-                if(hasVideo) {
-                   showSnackBar(context, "This pack contains animated sticker which isnt supported!", duration: 4);
-                   return Navigator.pop(context);
+                if (hasVideo) {
+                  showSnackBar(context,
+                      "Convert TGS, WebM or GIF stickers to animated WebP before importing.",
+                      duration: 4);
+                  return Navigator.pop(context);
                 }
                 Navigator.of(context).push(
                   PageRouteBuilder(
