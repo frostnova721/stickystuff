@@ -41,6 +41,10 @@ dependencies:
   flutter_whatsapp_stickers: 
     path: "../flutter_whatsapp_stickers"
 
+    # Use this repo for intended stability, path is js for dev tests!
+    # git:
+      # url: https://github.com/frostnova721/flutter_whatsapp_stickers.git
+
   # The following adds the Cupertino Icons font sto your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^2.0.0
